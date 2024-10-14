@@ -4,7 +4,11 @@ import { ReactComponent as KnowledgeBaseIcon } from '@/assets/svg/knowledge-base
 import { useTranslate } from '@/hooks/common-hooks';
 import { useFetchAppConf } from '@/hooks/logic-hooks';
 import { useNavigateWithFromState } from '@/hooks/route-hook';
-import { MessageOutlined, SearchOutlined } from '@ant-design/icons';
+import {
+  MessageOutlined,
+  SearchOutlined,
+  SettingOutlined,
+} from '@ant-design/icons';
 import { Flex, Layout, Radio, Space, theme } from 'antd';
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'umi';
@@ -30,6 +34,7 @@ const RagHeader = () => {
       { path: '/search', name: t('search'), icon: SearchOutlined },
       { path: '/flow', name: t('flow'), icon: GraphIcon },
       { path: '/file', name: t('fileManager'), icon: FileIcon },
+      { path: '/user-setting', name: t('setting'), icon: SettingOutlined },
     ],
     [t],
   );
@@ -60,8 +65,9 @@ const RagHeader = () => {
       }}
     >
       <Space size={12} onClick={handleLogoClick} className={styles.logoWrapper}>
-        <img src="/logo.svg" alt="" className={styles.appIcon} />
+        <img src="/logo.png" alt="" className={styles.appIcon} />
         <span className={styles.appName}>{appConf.appName}</span>
+        <span className={styles.appVersion}>版本号：{appConf.appVersion}</span>
       </Space>
       <Space size={[0, 8]} wrap>
         <Radio.Group

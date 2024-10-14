@@ -22,7 +22,8 @@ from flask import request, Response
 from flask_login import login_required, current_user
 
 from api.db import LLMType
-from api.db.services.dialog_service import DialogService, ConversationService, chat, ask
+from api.db.services.dialog_service import DialogService, ConversationService, chat
+from api.db.services.setting_service import ask
 from api.db.services.knowledgebase_service import KnowledgebaseService
 from api.db.services.llm_service import LLMBundle, TenantService, TenantLLMService
 from api.settings import RetCode, retrievaler

@@ -499,6 +499,18 @@
                     "model_type": "embedding"
                 },
                 {
+                    "llm_name": "jinaai/jina-embeddings-v3",
+                    "tags": "TEXT EMBEDDING",
+                    "max_tokens": 8196,
+                    "model_type": "embedding"
+                },
+                {
+                    "llm_name": "jinaai/jina-embeddings-v2-base-zh",
+                    "tags": "TEXT EMBEDDING",
+                    "max_tokens": 8196,
+                    "model_type": "embedding"
+                },
+                {
                     "llm_name": "BAAI/bge-reranker-v2-m3",
                     "tags": "RE-RANK,2k",
                     "max_tokens": 2048,

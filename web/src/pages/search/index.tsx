@@ -10,6 +10,7 @@ import {
   useSelectTestingResult,
 } from '@/hooks/knowledge-hooks';
 import { useGetPaginationWithRouter } from '@/hooks/logic-hooks';
+import { useSetSearchSetting } from '@/hooks/search-hooks';
 import { IReference } from '@/interfaces/database/chat';
 import {
   Card,
@@ -33,9 +34,13 @@ import { isEmpty } from 'lodash';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import MarkdownContent from '../chat/markdown-content';
-import { useSendQuestion, useShowMindMapDrawer } from './hooks';
+import {
+  useSendQuestion,
+  useShowMindMapDrawer,
+  useShowSearchSettingDrawer,
+} from './hooks';
+import Setting from './index-setting';
 import styles from './index.less';
-import MindMapDrawer from './mindmap-drawer';
 import SearchSidebar from './sidebar';
 
 const { Content } = Layout;
@@ -75,6 +80,16 @@ const SearchPage = () => {
     mindMapLoading,
     mindMap,
   } = useShowMindMapDrawer(checkedWithoutEmbeddingIdList, searchStr);
+
+  const {
+    settingLoading,
+    settingVisible,
+    showSettingModal,
+    hideSettingModal,
+    searchSetting,
+  } = useShowSearchSettingDrawer();
+
+  const { setSearch } = useSetSearchSetting();
 
   const onChange: PaginationProps['onChange'] = (pageNumber, pageSize) => {
     pagination.onChange?.(pageNumber, pageSize);
@@ -248,13 +263,29 @@ const SearchPage = () => {
           chunk={selectedChunk}
         ></PdfDrawer>
       )}
-      {mindMapVisible && (
-        <MindMapDrawer
-          visible={mindMapVisible}
-          hideModal={hideMindMapModal}
-          data={mindMap}
-          loading={mindMapLoading}
-        ></MindMapDrawer>
+      {/*{mindMapVisible && (*/}
+      {/*  <MindMapDrawer*/}
+      {/*    visible={mindMapVisible}*/}
+      {/*    hideModal={hideMindMapModal}*/}
+      {/*    data={mindMap}*/}
+      {/*    loading={mindMapLoading}*/}
+      {/*  ></MindMapDrawer>*/}
+      {/*)}*/}
+      {
+        <FloatButton
+          className={styles.settingFloatButton}
+          onClick={showSettingModal}
+          icon={<SvgIcon name="more" width={24} height={30}></SvgIcon>}
+        />
+      }
+      {settingVisible && (
+        <Setting
+          visible={settingVisible}
+          loading={settingLoading}
+          hideModal={hideSettingModal}
+          data={searchSetting}
+          onOk={setSearch}
+        ></Setting>
       )}
     </>
   );

@@ -5,8 +5,8 @@ export enum UserSettingRouteKey {
   Password = 'password',
   Model = 'model',
   System = 'system',
-  Team = 'team',
-  Logout = 'logout',
+  // Team = 'team',
+  // Logout = 'logout',
 }
 
 export const UserSettingRouteMap = {

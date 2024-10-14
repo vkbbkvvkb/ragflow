@@ -104,4 +104,8 @@ export default {
   resetCanvas: `${api_host}/canvas/reset`,
   runCanvas: `${api_host}/canvas/completion`,
   testDbConnect: `${api_host}/canvas/test_db_connect`,
+
+  // search setting
+  get_setting_detail: `${api_host}/search/detail`,
+  save_setting: `${api_host}/search/save`,
 };

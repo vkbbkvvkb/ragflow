@@ -29,7 +29,7 @@ import numpy as np
 import asyncio
 
 from api.settings import LIGHTEN
-from api.utils.file_utils import get_home_cache_dir
+from api.utils.file_utils import get_home_cache_dir, get_project_base_directory
 from rag.utils import num_tokens_from_string, truncate
 import google.generativeai as genai 
 import json
@@ -61,21 +61,16 @@ class DefaultEmbedding(Base):
 
         """
         if not LIGHTEN and not DefaultEmbedding._model:
+            local_dir = os.path.join(get_project_base_directory(), os.path.join("huggingface.co", model_name))
             with DefaultEmbedding._model_lock:
-                from FlagEmbedding import FlagModel
-                import torch
+                from sentence_transformers import SentenceTransformer
                 if not DefaultEmbedding._model:
                     try:
-                        DefaultEmbedding._model = FlagModel(os.path.join(get_home_cache_dir(), re.sub(r"^[a-zA-Z]+/", "", model_name)),
-                                                            query_instruction_for_retrieval="为这个句子生成表示以用于检索相关文章：",
-                                                            use_fp16=torch.cuda.is_available())
+                        DefaultEmbedding._model = SentenceTransformer(local_dir, trust_remote_code=True)
                     except Exception as e:
-                        model_dir = snapshot_download(repo_id="BAAI/bge-large-zh-v1.5",
-                                                      local_dir=os.path.join(get_home_cache_dir(), re.sub(r"^[a-zA-Z]+/", "", model_name)),
-                                                      local_dir_use_symlinks=False)
-                        DefaultEmbedding._model = FlagModel(model_dir,
-                                                            query_instruction_for_retrieval="为这个句子生成表示以用于检索相关文章：",
-                                                            use_fp16=torch.cuda.is_available())
+                        model_dir = snapshot_download(repo_id=model_name,
+                                                      local_dir=local_dir)
+                        DefaultEmbedding._model = SentenceTransformer(model_dir, trust_remote_code=True)
         self._model = DefaultEmbedding._model
 
     def encode(self, texts: list, batch_size=32):

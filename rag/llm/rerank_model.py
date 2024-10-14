@@ -22,7 +22,7 @@ from abc import ABC
 import numpy as np
 
 from api.settings import LIGHTEN
-from api.utils.file_utils import get_home_cache_dir
+from api.utils.file_utils import get_home_cache_dir, get_project_base_directory
 from rag.utils import num_tokens_from_string, truncate
 import json
 
@@ -58,17 +58,14 @@ class DefaultRerank(Base):
         if not LIGHTEN and not DefaultRerank._model:
             import torch
             from FlagEmbedding import FlagReranker
+            local_dir = os.path.join(get_project_base_directory(), os.path.join("huggingface.co", model_name))
             with DefaultRerank._model_lock:
                 if not DefaultRerank._model:
                     try:
-                        DefaultRerank._model = FlagReranker(
-                            os.path.join(get_home_cache_dir(), re.sub(r"^[a-zA-Z]+/", "", model_name)),
-                            use_fp16=torch.cuda.is_available())
+                        DefaultRerank._model = FlagReranker(local_dir, use_fp16=torch.cuda.is_available())
                     except Exception as e:
                         model_dir = snapshot_download(repo_id=model_name,
-                                                      local_dir=os.path.join(get_home_cache_dir(),
-                                                                             re.sub(r"^[a-zA-Z]+/", "", model_name)),
-                                                      local_dir_use_symlinks=False)
+                                                      local_dir=local_dir)
                         DefaultRerank._model = FlagReranker(model_dir, use_fp16=torch.cuda.is_available())
         self._model = DefaultRerank._model
 

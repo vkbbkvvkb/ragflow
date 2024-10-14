@@ -1053,3 +1053,25 @@ def migrate_db():
         except Exception as e:
             pass
 
+class Setting(DataBaseModel):
+    id = CharField(max_length=32, primary_key=True)
+    tenant_id = CharField(max_length=32, null=False, index=True)
+    llm_id = CharField(max_length=128, null=False, help_text="llm ID")
+    llm_setting = JSONField(null=False, default={"temperature": 0.1, "top_p": 0.3, "frequency_penalty": 0.7,
+                                                 "presence_penalty": 0.4, "max_tokens": 8192})
+    prompt_config = JSONField(null=False, default={"system": "", "prologue": "您好，我是您的助手，can I help you?",
+                                                   "parameters": [], "empty_response": "Sorry! 知识库中未找到相关内容！"})
+    similarity_threshold = FloatField(default=0.1)
+    vector_similarity_weight = FloatField(default=0.3)
+
+    top_n = IntegerField(default=12)
+
+    rerank_id = CharField(
+        max_length=128,
+        null=False,
+        help_text="rerank model ID")
+    top_k = IntegerField(default=1024)
+
+    class Meta:
+        db_table = "setting"
+

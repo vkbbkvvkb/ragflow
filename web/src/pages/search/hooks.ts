@@ -1,3 +1,8 @@
+import { variableEnabledFieldMap } from '@/constants/chat';
+import {
+  ModelVariableType,
+  settledModelVariableMap,
+} from '@/constants/knowledge';
 import { useFetchMindMap, useFetchRelatedQuestions } from '@/hooks/chat-hooks';
 import { useSetModalState } from '@/hooks/common-hooks';
 import { useTestChunkRetrieval } from '@/hooks/knowledge-hooks';
@@ -5,7 +10,8 @@ import {
   useGetPaginationWithRouter,
   useSendMessageWithSse,
 } from '@/hooks/logic-hooks';
-import { IAnswer } from '@/interfaces/database/chat';
+import { useFetchSearchSetting } from '@/hooks/search-hooks';
+import { IAnswer, Variable } from '@/interfaces/database/chat';
 import api from '@/utils/api';
 import { get, isEmpty, trim } from 'lodash';
 import {
@@ -232,4 +238,51 @@ export const usePendingMindMap = () => {
   }, [setCountInterval]);
 
   return Number(((count / 43) * 100).toFixed(0));
+};
+
+export const useShowSearchSettingDrawer = () => {
+  const { visible, showModal, hideModal } = useSetModalState();
+  const {
+    fetchSearchSetting,
+    data: searchSetting,
+    loading: settingLoading,
+  } = useFetchSearchSetting();
+
+  const handleShowModal = useCallback(() => {
+    fetchSearchSetting();
+    showModal();
+  }, [fetchSearchSetting, showModal]);
+
+  return {
+    settingLoading: settingLoading,
+    settingVisible: visible,
+    showSettingModal: handleShowModal,
+    hideSettingModal: hideModal,
+    searchSetting: searchSetting,
+  };
+};
+
+export const useSetLlmSetting = (form?: FormInstance) => {
+  const initialLlmSetting = undefined;
+
+  useEffect(() => {
+    const switchBoxValues = Object.keys(variableEnabledFieldMap).reduce<
+      Record<string, boolean>
+    >((pre, field) => {
+      pre[field] =
+        initialLlmSetting === undefined
+          ? true
+          : !!initialLlmSetting[
+              variableEnabledFieldMap[
+                field as keyof typeof variableEnabledFieldMap
+              ] as keyof Variable
+            ];
+      return pre;
+    }, {});
+    const otherValues = settledModelVariableMap[ModelVariableType.Precise];
+    form?.setFieldsValue({
+      ...switchBoxValues,
+      ...otherValues,
+    });
+  }, [form, initialLlmSetting]);
 };

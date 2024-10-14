@@ -1,13 +1,12 @@
+import { useFetchAppConf } from '@/hooks/logic-hooks';
 import { useLogin, useRegister } from '@/hooks/login-hooks';
 import { rsaPsw } from '@/utils';
-import { Button, Checkbox, Form, Input } from 'antd';
+import { Button, Form, Input } from 'antd';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Icon, useNavigate } from 'umi';
-import RightPanel from './right-panel';
-
-import { Domain } from '@/constants/common';
+import { useNavigate } from 'umi';
 import styles from './index.less';
+import RightPanel from './right-panel';
 
 const Login = () => {
   const [title, setTitle] = useState('login');
@@ -16,6 +15,7 @@ const Login = () => {
   const { register, loading: registerLoading } = useRegister();
   const { t } = useTranslation('translation', { keyPrefix: 'login' });
   const loading = signLoading || registerLoading;
+  const appConf = useFetchAppConf();
 
   const changeTitle = () => {
     setTitle((title) => (title === 'login' ? 'register' : 'login'));
@@ -56,12 +56,6 @@ const Login = () => {
   };
   const formItemLayout = {
     labelCol: { span: 6 },
-    // wrapperCol: { span: 8 },
-  };
-
-  const toGoogle = () => {
-    window.location.href =
-      'https://github.com/login/oauth/authorize?scope=user:email&client_id=302129228f0d96055bee';
   };
 
   return (
@@ -69,12 +63,8 @@ const Login = () => {
       <div className={styles.loginLeft}>
         <div className={styles.leftContainer}>
           <div className={styles.loginTitle}>
-            <div>{title === 'login' ? t('login') : t('register')}</div>
-            <span>
-              {title === 'login'
-                ? t('loginDescription')
-                : t('registerDescription')}
-            </span>
+            <div>{appConf.appName}</div>
+            <span>{title === 'login' ? t('login') : t('register')}</span>
           </div>
 
           <Form
@@ -113,73 +103,48 @@ const Login = () => {
                 onPressEnter={onCheck}
               />
             </Form.Item>
-            {title === 'login' && (
-              <Form.Item name="remember" valuePropName="checked">
-                <Checkbox> {t('rememberMe')}</Checkbox>
-              </Form.Item>
-            )}
-            <div>
+            <div className={styles.loginButton}>
               {title === 'login' && (
-                <div>
-                  {t('signInTip')}
-                  <Button type="link" onClick={changeTitle}>
-                    {t('signUp')}
-                  </Button>
-                </div>
+                <Button type="default" size="middle" onClick={changeTitle}>
+                  {t('signUp')}
+                </Button>
               )}
               {title === 'register' && (
-                <div>
-                  {t('signUpTip')}
-                  <Button type="link" onClick={changeTitle}>
-                    {t('login')}
-                  </Button>
-                </div>
-              )}
-            </div>
-            <Button
-              type="primary"
-              block
-              size="large"
-              onClick={onCheck}
-              loading={loading}
-            >
-              {title === 'login' ? t('login') : t('continue')}
-            </Button>
-            {title === 'login' && (
-              <>
-                {/* <Button
+                <Button
+                  type="default"
                   block
-                  size="large"
-                  onClick={toGoogle}
-                  style={{ marginTop: 15 }}
+                  size="middle"
+                  onClick={changeTitle}
                 >
-                  <div>
-                    <Icon
-                      icon="local:google"
-                      style={{ verticalAlign: 'middle', marginRight: 5 }}
-                    />
-                    Sign in with Google
-                  </div>
-                </Button> */}
-                {location.host === Domain && (
-                  <Button
-                    block
-                    size="large"
-                    onClick={toGoogle}
-                    style={{ marginTop: 15 }}
-                  >
-                    <div>
-                      <Icon
-                        icon="local:github"
-                        style={{ verticalAlign: 'middle', marginRight: 5 }}
-                      />
-                      Sign in with Github
-                    </div>
-                  </Button>
-                )}
-              </>
-            )}
+                  {t('signIn')}
+                </Button>
+              )}
+              <Button
+                type="primary"
+                block
+                size="middle"
+                onClick={onCheck}
+                loading={loading}
+              >
+                {title === 'login' ? t('login') : t('register')}
+              </Button>
+            </div>
           </Form>
+        </div>
+        <div className={styles.loginBottom}>
+          <span className={styles.appYear}>
+            {appConf.appYear}
+            <a
+              href="https://www.jandar.com.cn/"
+              target="_blank"
+              className={styles.appCompany}
+            >
+              {appConf.appCompany}
+            </a>
+          </span>
+          <span className={styles.appVersion}>
+            版本号：{appConf.appVersion}
+          </span>
         </div>
       </div>
       <div className={styles.loginRight}>

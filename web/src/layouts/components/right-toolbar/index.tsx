@@ -1,61 +1,39 @@
+import { ReactComponent as LogoutIcon } from '@/assets/svg/logout.svg';
 import { useTranslate } from '@/hooks/common-hooks';
-import { DownOutlined, GithubOutlined } from '@ant-design/icons';
-import { Dropdown, MenuProps, Space } from 'antd';
-import camelCase from 'lodash/camelCase';
-import React from 'react';
-import User from '../user';
-
-import { LanguageList } from '@/constants/common';
-import { useChangeLanguage } from '@/hooks/logic-hooks';
+import { useLogout } from '@/hooks/login-hooks';
 import { useFetchUserInfo } from '@/hooks/user-setting-hooks';
+import { Avatar, Dropdown, MenuProps, Space } from 'antd';
 import styled from './index.less';
 
-const Circle = ({ children, ...restProps }: React.PropsWithChildren) => {
-  return (
-    <div {...restProps} className={styled.circle}>
-      {children}
-    </div>
-  );
-};
-
-const handleGithubCLick = () => {
-  window.open('https://github.com/infiniflow/ragflow', 'target');
-};
-
 const RightToolBar = () => {
-  const { t } = useTranslate('common');
-  const changeLanguage = useChangeLanguage();
-  const {
-    data: { language = 'English' },
-  } = useFetchUserInfo();
-
-  const handleItemClick: MenuProps['onClick'] = ({ key }) => {
-    changeLanguage(key);
+  const { t } = useTranslate('setting');
+  const { logout } = useLogout();
+  const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
+    logout();
   };
-
-  const items: MenuProps['items'] = LanguageList.map((x) => ({
-    key: x,
-    label: <span>{t(camelCase(x))}</span>,
-  })).reduce<MenuProps['items']>((pre, cur) => {
-    return [...pre!, { type: 'divider' }, cur];
-  }, []);
+  const user_logout_menu: MenuProps['items'] = [
+    {
+      key: '1',
+      onClick: handleMenuClick,
+      label: (
+        <Space>
+          <LogoutIcon />
+          {t('logout')}
+        </Space>
+      ),
+    },
+  ];
+  const { data: userInfo, loading } = useFetchUserInfo();
 
   return (
     <div className={styled.toolbarWrapper}>
-      <Space wrap size={16}>
-        <Dropdown menu={{ items, onClick: handleItemClick }} placement="bottom">
-          <Space className={styled.language}>
-            <b>{t(camelCase(language))}</b>
-            <DownOutlined />
+      <Space size={16}>
+        <Dropdown menu={{ items: user_logout_menu }}>
+          <Space size={12}>
+            <Avatar size="small" src={userInfo.avatar} />
+            <span>{userInfo.nickname}</span>
           </Space>
         </Dropdown>
-        <Circle>
-          <GithubOutlined onClick={handleGithubCLick} />
-        </Circle>
-        {/* <Circle>
-          <MonIcon />
-        </Circle> */}
-        <User></User>
       </Space>
     </div>
   );
