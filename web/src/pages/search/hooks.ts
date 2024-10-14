@@ -13,7 +13,7 @@ import {
 import { useFetchSearchSetting } from '@/hooks/search-hooks';
 import { IAnswer, Variable } from '@/interfaces/database/chat';
 import api from '@/utils/api';
-import { get, isEmpty, trim } from 'lodash';
+import { get, isEmpty, isEqual, trim } from 'lodash';
 import {
   ChangeEventHandler,
   useCallback,
@@ -194,6 +194,7 @@ export const useTestRetrieval = (
 
 export const useShowMindMapDrawer = (kbIds: string[], question: string) => {
   const { visible, showModal, hideModal } = useSetModalState();
+  const ref = useRef<any>();
 
   const {
     fetchMindMap,
@@ -202,7 +203,14 @@ export const useShowMindMapDrawer = (kbIds: string[], question: string) => {
   } = useFetchMindMap();
 
   const handleShowModal = useCallback(() => {
-    fetchMindMap({ question: trim(question), kb_ids: kbIds });
+    const searchParams = { question: trim(question), kb_ids: kbIds };
+    if (
+      !isEmpty(searchParams.question) &&
+      !isEqual(searchParams, ref.current)
+    ) {
+      ref.current = searchParams;
+      fetchMindMap(searchParams);
+    }
     showModal();
   }, [fetchMindMap, showModal, question, kbIds]);
 
